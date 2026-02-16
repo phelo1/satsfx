@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     :root{
       --bg:#0b0f1a;
@@ -40,51 +41,41 @@
       -webkit-background-clip:text;-webkit-text-fill-color:transparent;
     }
     .hero p{color:var(--muted);font-size:1.1rem;margin-top:16px;max-width:680px;}
-    .cta{
-      display:flex;gap:14px;margin-top:24px;flex-wrap:wrap;
-    }
-    .btn{
-      padding:14px 18px;border-radius:14px;border:1px solid #2a3446;background:#111827;
-      color:#fff;font-weight:600;cursor:pointer;transition:.2s;box-shadow:0 0 0 transparent;
-    }
+    .cta{display:flex;gap:14px;margin-top:24px;flex-wrap:wrap;}
+    .btn{padding:14px 18px;border-radius:14px;border:1px solid #2a3446;background:#111827;color:#fff;font-weight:600;cursor:pointer;transition:.2s;box-shadow:0 0 0 transparent;}
     .btn.primary{background:linear-gradient(90deg,var(--accent),#ffb347);color:#111827;border:none;}
     .btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(247,147,26,.2)}
-
     .glow-orb{position:absolute;right:-120px;top:-60px;width:320px;height:320px;border-radius:50%;
       background:radial-gradient(circle at 30% 30%, rgba(247,147,26,.6), transparent 60%);
       filter:blur(10px);opacity:.8;pointer-events:none;}
-
     .hero-card{background:var(--card);border:1px solid #1f2937;border-radius:20px;padding:22px;backdrop-filter: blur(10px);}
     .hero-card h3{color:#fbbf24;margin-bottom:8px;}
     .stat{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px dashed #2a3446;color:#cbd5e1}
-
     .tabs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:30px 0 16px;}
     .tab{padding:10px 14px;border-radius:999px;background:#111827;border:1px solid #1f2937;color:#cbd5e1;cursor:pointer;transition:.2s;font-weight:600}
     .tab.active{background:linear-gradient(90deg,var(--accent),#ffb347);color:#111827;border:none;}
-
     .section{display:none;animation:fadeIn .4s ease;}
     .section.active{display:block;}
     @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
     .card{background:var(--card);border:1px solid #1f2937;border-radius:18px;padding:18px;backdrop-filter: blur(8px);}
     label{display:block;margin:8px 0;color:#fbbf24;font-weight:600}
     input,select{width:100%;padding:12px;border-radius:12px;border:1px solid #2a3446;background:#0f172a;color:#fff;font-size:1rem}
-
     .timeline{display:grid;gap:12px}
     .timeline-item{padding:16px;border-left:3px solid var(--accent);background:rgba(17,24,39,.6);border-radius:14px;}
     .timeline-item strong{color:#fbbf24}
-
     .big-number{font-size:1.6rem;font-weight:700;color:#fbbf24}
     .kicker{color:#94a3b8;font-size:.9rem}
-
-    .vapor{height:220px;border-radius:14px;background:linear-gradient(to bottom, rgba(255,255,255,.15), rgba(255,255,255,0));position:relative;overflow:hidden}
-    .vapor::after{content:"$";position:absolute;left:50%;transform:translateX(-50%);font-size:4rem;opacity:.6;animation:vaporize 3s infinite;}
-    @keyframes vaporize{0%{top:100%;opacity:.2}100%{top:-40px;opacity:0}}
-
     .regret{margin-top:16px;padding:14px;border-radius:14px;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4)}
-
     .footer{padding:40px 0;text-align:center;color:#94a3b8;font-size:.9rem}
+    .chart-wrap{position:relative;height:320px;}
+    .burn-overlay{
+      position:absolute;right:20px;bottom:20px;width:120px;height:160px;pointer-events:none;
+      background:radial-gradient(circle at 50% 0%, rgba(255,140,0,.9), rgba(255,69,0,.4) 40%, transparent 70%);
+      filter:blur(.5px);border-radius:0 0 20px 20px;animation:flame 1.6s infinite;
+    }
+    .burn-overlay::after{content:"$";position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);font-size:42px;color:#fff;opacity:.8}
+    @keyframes flame{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.05)}100%{transform:translateY(0) scale(1)}}
 
     @media(max-width:900px){.hero{grid-template-columns:1fr;}}
   </style>
@@ -95,7 +86,7 @@
       <div>
         <div class="kicker">SatsFX • Satoshi Time Machine</div>
         <h1>What if you bought Bitcoin?</h1>
-        <p>Travel through Bitcoin’s history and see exactly how fiat melted while sats compounded. This is a cinematic, data-driven look at the opportunity cost of staying in dollars.</p>
+        <p>Real‑time prices, real history, and a cinematic timeline that shows how fiat evaporated while sats compounded. No assumptions — live data.</p>
         <div class="cta">
           <button class="btn primary" data-tab="portfolio">Run the "What If"</button>
           <button class="btn" data-tab="child">Child Retirement Calculator</button>
@@ -103,9 +94,9 @@
       </div>
       <div class="hero-card">
         <h3>Live Narrative</h3>
-        <div class="stat"><span>Bitcoin Price (assumed)</span><strong>$120,000</strong></div>
-        <div class="stat"><span>USD purchasing power vs BTC since 2009</span><strong>-99.99%</strong></div>
-        <div class="stat"><span>Stacking sats momentum</span><strong>Compounding</strong></div>
+        <div class="stat"><span>BTC/USD (live)</span><strong id="livePrice">…</strong></div>
+        <div class="stat"><span>USD → sats (live)</span><strong id="liveSats">…</strong></div>
+        <div class="stat"><span>Updated</span><strong id="liveTime">…</strong></div>
       </div>
       <div class="glow-orb"></div>
     </div>
@@ -120,7 +111,7 @@
 
     <section id="timeline" class="section active">
       <div class="card">
-        <h2>Bitcoin Milestones</h2>
+        <h2>Bitcoin Milestones (historical)</h2>
         <div class="timeline" id="timeline-list"></div>
       </div>
     </section>
@@ -139,6 +130,12 @@
         </div>
         <div id="regret" class="regret"></div>
       </div>
+      <div class="card">
+        <h3>BTC/USD (historical)</h3>
+        <div class="chart-wrap">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
     </section>
 
     <section id="inflation" class="section">
@@ -148,13 +145,23 @@
         <select id="inflationYear"></select>
         <div id="inflationResult" style="margin-top:10px;color:#cbd5e1"></div>
       </div>
+      <div class="card">
+        <h3>Sats per USD (historical)</h3>
+        <div class="chart-wrap">
+          <canvas id="satsChart"></canvas>
+          <div class="burn-overlay" title="USD burning"></div>
+        </div>
+      </div>
     </section>
 
     <section id="vapor" class="section">
       <div class="card">
         <h2>USD Vaporization</h2>
         <p class="kicker">Fiat loses value as Bitcoin absorbs monetary energy.</p>
-        <div class="vapor"></div>
+        <div class="chart-wrap">
+          <canvas id="vaporChart"></canvas>
+          <div class="burn-overlay"></div>
+        </div>
       </div>
     </section>
 
@@ -173,36 +180,61 @@
   </div>
 
   <script>
-    const BTC_CURRENT = 120000;
-    const priceByDate = {
-      "2009-01-03":0.01, "2010-07-18":0.09, "2011-02-09":1, "2013-11-29":1000,
-      "2014-09-19":400, "2016-04-15":420, "2017-12-17":20000, "2020-03-13":5000,
-      "2021-11-10":69000, "2022-11-21":16000, "2024-01-01":45000
-    };
+    const CG_BASE = "https://api.coingecko.com/api/v3";
+    let historical = []; // [timestamp, price]
+    let livePrice = 0;
+
     const timeline = [
-      {year:2009, event:"Bitcoin Created – Genesis Block", price:0.01},
-      {year:2010, event:"Pizza Day (10k BTC)", price:0.09},
-      {year:2011, event:"BTC hits $1", price:1},
-      {year:2013, event:"BTC hits $1,000", price:1000},
-      {year:2017, event:"BTC hits $20,000", price:20000},
-      {year:2021, event:"BTC hits $69,000", price:69000},
-      {year:2024, event:"ETF wave – $120,000", price:120000}
+      {year:2009, event:"Bitcoin Created – Genesis Block"},
+      {year:2010, event:"Pizza Day (10k BTC)"},
+      {year:2011, event:"BTC hits $1"},
+      {year:2013, event:"BTC hits $1,000"},
+      {year:2017, event:"BTC hits $20,000"},
+      {year:2021, event:"BTC hits $69,000"},
+      {year:2024, event:"ETF wave – $120,000"}
     ];
 
     const timelineList = document.getElementById("timeline-list");
     timeline.forEach(m => {
       const div = document.createElement("div");
       div.className = "timeline-item";
-      div.innerHTML = `<strong>${m.year}</strong> — ${m.event}<br><span class="kicker">Price: $${m.price}</span>`;
+      div.innerHTML = `<strong>${m.year}</strong> — ${m.event}`;
       timelineList.appendChild(div);
     });
+
+    async function loadLivePrice(){
+      const r = await fetch(`${CG_BASE}/simple/price?ids=bitcoin&vs_currencies=usd`);
+      const d = await r.json();
+      livePrice = d.bitcoin.usd;
+      document.getElementById("livePrice").textContent = `$${livePrice.toLocaleString()}`;
+      const sats = Math.floor(100000000 / livePrice);
+      document.getElementById("liveSats").textContent = `${sats.toLocaleString()} sats / $1`;
+      document.getElementById("liveTime").textContent = new Date().toLocaleTimeString();
+    }
+
+    async function loadHistorical(){
+      const r = await fetch(`${CG_BASE}/coins/bitcoin/market_chart?vs_currency=usd&days=max&interval=daily`);
+      const d = await r.json();
+      historical = d.prices; // [ts, price]
+      buildCharts();
+      updatePortfolio();
+      updateInflationOptions();
+    }
+
+    function nearestPrice(dateStr){
+      const t = new Date(dateStr).getTime();
+      let best = historical[0];
+      for(const p of historical){ if(Math.abs(p[0]-t) < Math.abs(best[0]-t)) best = p; }
+      return best[1];
+    }
 
     function updatePortfolio(){
       const usd = Number(document.getElementById("usdAmount").value || 0);
       const d = document.getElementById("investmentDate").value;
-      const price = priceByDate[d] || 400;
-      const btc = usd / price;
-      const now = btc * BTC_CURRENT;
+      if(!historical.length || !d || usd<=0 || !livePrice) return;
+      const thenPrice = nearestPrice(d);
+      const btc = usd / thenPrice;
+      const now = btc * livePrice;
       document.getElementById("btcBought").textContent = btc.toFixed(6) + " BTC";
       document.getElementById("todayValue").textContent = "$" + now.toLocaleString();
       document.getElementById("gainMultiple").textContent = (now/usd).toFixed(1) + "x";
@@ -212,50 +244,68 @@
         mult>10 ? "⚠️ Big regret: stack sats sooner." :
         mult>2 ? "🤔 Some regret: time in market matters." : "✅ Low regret.";
     }
-    document.getElementById("usdAmount").addEventListener("input", updatePortfolio);
-    document.getElementById("investmentDate").addEventListener("input", updatePortfolio);
-    updatePortfolio();
 
-    const inflationYear = document.getElementById("inflationYear");
-    const inflationData = {
-      2009:{item:"iPhone 3GS", price:199, btc:Infinity},
-      2010:{item:"iPad 1", price:499, btc:5544},
-      2014:{item:"iPhone 6", price:649, btc:1.6},
-      2017:{item:"iPhone X", price:999, btc:0.05},
-      2021:{item:"iPhone 13", price:799, btc:0.01}
-    };
-    Object.keys(inflationData).forEach(y=>{
-      const opt = document.createElement("option");
-      opt.value=y; opt.textContent=y; inflationYear.appendChild(opt);
-    });
-    function updateInflation(){
-      const y = inflationYear.value; const d = inflationData[y];
-      const btc = d.btc===Infinity ? "∞" : d.btc.toFixed(4);
-      const val = d.btc===Infinity ? "∞" : "$"+(d.btc*BTC_CURRENT).toLocaleString();
-      document.getElementById("inflationResult").innerHTML =
-        `<strong>${d.item}</strong> cost $${d.price} in ${y}. That was ${btc} BTC. Today: ${val}`;
+    function updateInflationOptions(){
+      const inflationYear = document.getElementById("inflationYear");
+      const years = Array.from(new Set(historical.map(p=>new Date(p[0]).getFullYear())));
+      inflationYear.innerHTML = years.map(y=>`<option value="${y}">${y}</option>`).join("");
+      inflationYear.value = years[Math.floor(years.length/2)];
+      updateInflation();
     }
-    inflationYear.addEventListener("change", updateInflation);
-    updateInflation();
+
+    function updateInflation(){
+      const y = Number(document.getElementById("inflationYear").value);
+      const target = new Date(`${y}-01-01`).getTime();
+      const price = nearestPrice(`${y}-01-01`);
+      const satsPerUsd = Math.floor(100000000/price);
+      document.getElementById("inflationResult").innerHTML =
+        `In ${y}, 1 BTC = $${price.toLocaleString()}. $1 bought ~${satsPerUsd.toLocaleString()} sats.`;
+    }
+
+    function buildCharts(){
+      const labels = historical.map(p=>new Date(p[0]).toISOString().slice(0,10));
+      const prices = historical.map(p=>p[1]);
+      const sats = historical.map(p=>100000000/p[1]);
+
+      new Chart(document.getElementById('priceChart'),{
+        type:'line',
+        data:{labels, datasets:[{label:'BTC/USD', data:prices, borderColor:'#f7931a', tension:.25, pointRadius:0}]},
+        options:{responsive:true, scales:{x:{display:false}, y:{ticks:{color:'#cbd5e1'}}}, plugins:{legend:{display:false}}}
+      });
+      new Chart(document.getElementById('satsChart'),{
+        type:'line',
+        data:{labels, datasets:[{label:'Sats per $1', data:sats, borderColor:'#ffcf70', tension:.25, pointRadius:0}]},
+        options:{responsive:true, scales:{x:{display:false}, y:{ticks:{color:'#cbd5e1'}}}, plugins:{legend:{display:false}}}
+      });
+      new Chart(document.getElementById('vaporChart'),{
+        type:'line',
+        data:{labels, datasets:[{label:'USD value in BTC terms', data:sats, borderColor:'#f87171', tension:.25, pointRadius:0}]},
+        options:{responsive:true, scales:{x:{display:false}, y:{ticks:{color:'#cbd5e1'}}}, plugins:{legend:{display:false}}}
+      });
+    }
 
     function updateChild(){
       const dob = new Date(document.getElementById("childDob").value);
       const invest = Number(document.getElementById("childInvestment").value || 0);
+      if(!livePrice) return;
       const age = 65; const now = new Date();
       const years = age - (now.getFullYear() - dob.getFullYear());
-      const btc = invest / BTC_CURRENT;
-      const pess = btc * Math.pow(1.3, years) * BTC_CURRENT;
-      const avg = btc * Math.pow(1.5, years) * BTC_CURRENT;
-      const bull = btc * Math.pow(1.75, years) * BTC_CURRENT;
+      const btc = invest / livePrice;
+      const pess = btc * Math.pow(1.3, years) * livePrice;
+      const avg = btc * Math.pow(1.5, years) * livePrice;
+      const bull = btc * Math.pow(1.75, years) * livePrice;
       document.getElementById("childResult").innerHTML =
         `Years to retire: <strong>${years}</strong><br>`+
         `Pessimistic: $${pess.toLocaleString()}<br>`+
         `Average: $${avg.toLocaleString()}<br>`+
         `Bullish: $${bull.toLocaleString()}`;
     }
+
+    document.getElementById("usdAmount").addEventListener("input", updatePortfolio);
+    document.getElementById("investmentDate").addEventListener("input", updatePortfolio);
+    document.getElementById("inflationYear").addEventListener("change", updateInflation);
     document.getElementById("childDob").addEventListener("input", updateChild);
     document.getElementById("childInvestment").addEventListener("input", updateChild);
-    updateChild();
 
     document.querySelectorAll('.tab, .btn').forEach(btn=>{
       if(btn.dataset.tab){
@@ -267,6 +317,13 @@
         });
       }
     });
+
+    (async ()=>{
+      await loadLivePrice();
+      await loadHistorical();
+      updateChild();
+      setInterval(loadLivePrice, 60000);
+    })();
   </script>
 </body>
 </html>
